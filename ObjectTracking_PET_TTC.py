@@ -1,8 +1,11 @@
-def metric(position1, position2, velocity1, velocity2):
+def metric_calculator(position1, position2, velocity1, velocity2):
+    """ 
+    Find if two objects intersect, the Post Encroachment Time, Time To Collision, and point of intersection.
+    """
     (cx1, cy1), (cx2, cy2) = position1, position2
     (vx1, vy1), (vx2, vy2) = velocity1, velocity2
 
-    # Non-moving cars
+    # Non-moving objects
     if {velocity1+velocity2} == {0}:
         return None, None
 
@@ -33,9 +36,9 @@ def metric(position1, position2, velocity1, velocity2):
             pet = max(temp1+temp2)
             return pet, temp[0]
 
-    # Calculate time to intersection point for each car
-    t2 = (vx1*cy1 - vx1*cy2 + vy1*cx2 - vy1*cx1) / (vx1*vy2 - vy1*vx2)
-    if vx1 != 0:  # If all four are zero both vehicles are still
+    # Calculate time to intersection point for each object
+    t2 = t2 = (vx1 * cy1 - vx1 * cy2 + vy1 * cx2 - vy1 * cx1) / (vx1 * vy2 - vy1 * vx2)
+    if vx1 != 0:  # If all four are zero both objects are still (would be caught before this point)
         t1 = (cx2 - cx1 + vx2 * t2) / vx1
     elif vx2 != 0:
         t1 = (cx1 - cx2 + vx1 * t2) / vx2
@@ -44,4 +47,4 @@ def metric(position1, position2, velocity1, velocity2):
     else:
         t1 = (cx1 - cx2 + vy2 * t2) / vy2
     intersection = [cx1 + vx1 * t1, cy1 + vy1 * t1]
-    return abs(t1-t2), t1 if t1-t2 == 0 else 'None', intersection
+    return abs(t1-t2), t1 if t1-t2 == 0 else None
