@@ -8,7 +8,7 @@ def metric(position1, position2, velocity1, velocity2):
 
     D = []
     # Linear Independence Test
-    for x, y in zip([vx1, vy1], [vx2, vy2]):  # Find linear dependence (parallel movement)
+    for x, y in zip(velocity1, velocity2):  # Find linear dependence (parallel movement)
         if (x==0 or y==0) and x != y:  # Intersecting lines (No dependence)
             break
         elif x == 0 and y == 0:  # Both are zero (might be moving parallel or both are still)
