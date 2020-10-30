@@ -6,7 +6,7 @@ def metric_calculator(position1, position2, velocity1, velocity2):
     (vx1, vy1), (vx2, vy2) = velocity1, velocity2
 
     # Non-moving objects
-    if {velocity1+velocity2} == {0}:
+    if set(velocity1+velocity2) == {0}:
         return None, None
 
     D = []
