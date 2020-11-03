@@ -2,6 +2,7 @@ def metric(position1, position2, velocity1, velocity2):
     """
         Find if two objects intersect, the Post Encroachment Time, Time To Collision, and point of intersection.
         Could return point of ttc as intersection point for same track
+        Assuming ability to collide, may want to find ∆v that would allow for a collision, normalized by average speed
     """
     (cx1, cy1), (cx2, cy2) = position1, position2
     (vx1, vy1), (vx2, vy2) = velocity1, velocity2
@@ -9,13 +10,16 @@ def metric(position1, position2, velocity1, velocity2):
     # Both Non-moving Case
     if set(velocity1+velocity2) == {0}:
         return None, None
+    # Both Same Position Case
+    if all([x == y for x, y in zip(position1, position2)]):
+        return 0, 0
     # One Stationary Case
     if set(velocity1) == {0} or set(velocity2) == {0}:
         if set(velocity1) == {0}:  # See which one is moving
             dx_dy = [x - y for x,y in zip(position1, position2)]
             tx_ty = []
             for x, y in zip(dx_dy, velocity2):
-                if x == 0 and y == 0:
+                if x == 0 and y == 0:  # No movement is needed and none is present
                     continue
                 elif (x == 0) ^ (y == 0):  # Movement is not needed and present or is needed and not present
                     return None, None
@@ -28,23 +32,20 @@ def metric(position1, position2, velocity1, velocity2):
         else:
             dx_dy = [x - y for x, y in zip(position2, position1)]
             tx_ty = []
-            for x, y in zip(dx_dy, velocity2):
-                if x == 0 and y == 0:
+            for x, y in zip(dx_dy, velocity1):
+                if x == 0 and y == 0:  # No movement is needed and none is present
                     continue
                 elif (x == 0) ^ (y == 0):  # Movement is not needed and is present or is needed and not present
                     return None, None
                 else:
                     tx_ty.append(x/y)  # Time to reach x/y coordinate of intersecting point
-            if len(tx_ty) == 1 or len(set(tx_ty)) == 1:
+            if len(tx_ty) == 1 or len(set(tx_ty)) == 1:  # Only needs to move in 1 direction and is
                 return tx_ty[0], tx_ty[0]
             else:  # Not intersecting
                 return None, None
-    # Both Same Position Case
-    if all([x == y for x, y in zip(position1, position2)]):
-        return 0, 0
-
+    # Parallel Test
     parallel = False
-    if vx1*vy2-vy1*vx2 == 0:  # Determinant test
+    if vx1*vy2-vy1*vx2 == 0:  # Calculate determinant
         parallel = True
     # Parallel Movement Case
     if parallel:
@@ -66,16 +67,11 @@ def metric(position1, position2, velocity1, velocity2):
             return pet, ttc[0]
         else:  # One point can't get to another
             return None, None
-
-    # Calculate time to intersection point for each car
-    t2 = (vx1 * cy1 - vx1 * cy2 + vy1 * cx2 - vy1 * cx1) / (vx1 * vy2 - vx2* vy1)
-    if vx1 != 0:  # If all four are zero both vehicles are still
+    # Calculate time to intersection point for each object
+    t2 = (vx1 * cy1 - vx1 * cy2 + vy1 * cx2 - vy1 * cx1) / (vx1 * vy2 - vx2* vy1)  # X plugged into Y
+    if vx1 != 0:
         t1 = (cx2 - cx1 + vx2 * t2) / vx1
-    elif vx2 != 0:
-        t1 = (cx1 - cx2 + vx1 * t2) / vx2
-    elif vy1 != 0:
-        t1 = (cx2 - cx1 + vy1 * t2) / vy1
     else:
-        t1 = (cx1 - cx2 + vy2 * t2) / vy2
+        t1 = (cy2 - cy1 + vy2 * t2) / vy1
     intersection = [cx1 + vx1 * t1, cy1 + vy1 * t1]
     return abs(t1-t2), t1 if t1-t2 == 0 else None
